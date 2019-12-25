@@ -2,6 +2,11 @@ use raylib::prelude::*;
 use rand::prelude::*;
 use arr_macro::arr;
 
+#[macro_use]
+extern crate lazy_static;
+
+mod lights;
+
 const WINDOW_WIDTH: i32 = 1280;
 const WINDOW_HEIGHT: i32 = 720;
 
@@ -91,3 +96,4 @@ fn main() {
         d.draw_text("- Mouse move to look around", 40, 60, 10, Color::DARKGRAY);
     }
 }
+
