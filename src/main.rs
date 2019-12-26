@@ -2,7 +2,6 @@ use raylib::prelude::*;
 use rand::prelude::*;
 use arr_macro::arr;
 
-#[macro_use]
 extern crate lazy_static;
 
 mod lights;
@@ -38,6 +37,10 @@ impl Column {
             color
         }
     }
+
+    fn generate_mesh(&self, thread: &RaylibThread) -> Mesh {
+        Mesh::gen_mesh_cube(thread, 2.0, self.height, 2.0)
+    }
 }
 
 fn main() {
@@ -53,6 +56,24 @@ fn main() {
         60.0
     );
     let columns: [Column; 20] = arr![Column::create_random(); 20];
+    let mut column_meshes: Vec<Mesh> = Vec::with_capacity(20);
+    for column in columns.into_iter() {
+        column_meshes.push(
+            column.generate_mesh(&thread)
+        )
+    }
+    let mut column_models: Vec<Model> = Vec::with_capacity(20);
+
+    for (index, _) in columns.into_iter().enumerate() {
+        let mesh = &column_meshes[index];
+        column_models.push(
+            rl.load_model_from_mesh(&thread, mesh).unwrap()
+        )
+    }
+    let mesh: Mesh = columns[0].generate_mesh(&thread);
+    let model: Model = rl.load_model_from_mesh(&thread, &mesh).unwrap();
+    // Borrow models vec to use in the loop
+    let models = &column_models;
 
     rl.set_camera_mode(&camera, CameraMode::CAMERA_FIRST_PERSON);
     rl.set_target_fps(60);
@@ -84,10 +105,21 @@ fn main() {
                 32.0, 5.0, 1.0, Color::GOLD
             );
 
-            for column in columns.into_iter() {
-                d2.draw_cube(column.position, 2.0, column.height, 2.0, column.color);
-                d2.draw_cube_wires(column.position, 2.0, column.height, 2.0, Color::MAROON);
-            };
+            // for column in columns.into_iter() {
+            //     d2.draw_cube(column.position, 2.0, column.height, 2.0, column.color);
+            //     d2.draw_cube_wires(column.position, 2.0, column.height, 2.0, Color::MAROON);
+            // };
+
+            // d2.draw_model(
+            //     &model,
+            //     columns[0].position, 1.0, columns[0].color
+            // );
+
+            for (index, model) in models.into_iter().enumerate() {
+                let position = columns[index].position;
+                let color = columns[index].color;
+                d2.draw_model(&model, position, 1.0, color);
+            }
         }
         d.draw_rectangle(10, 10, 220, 70, Color::SKYBLUE);
         d.draw_rectangle_lines(10, 10, 220, 70, Color::BLUE);

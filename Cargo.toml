@@ -10,4 +10,6 @@ edition = "2018"
 rand = "0.7"
 arr_macro = "0.1.3"
 lazy_static = "1.4.0"
-raylib = { git = "https://github.com/deltaphc/raylib-rs", branch = "master" }
+# raylib = { git = "https://github.com/deltaphc/raylib-rs", branch = "master" }
+raylib = { path = "../../raylib-rs/raylib" }
+log = "0.4.8"

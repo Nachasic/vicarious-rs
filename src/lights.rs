@@ -1,4 +1,4 @@
-mod Lights {
+mod lights {
     use std::sync::atomic;
     use std::os::raw::c_void;
     use raylib::prelude::*;
