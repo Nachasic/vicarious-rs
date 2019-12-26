@@ -43,6 +43,32 @@ impl Column {
     }
 }
 
+fn render_scene<T: RaylibDraw3D>(d2: &mut T, models: &Vec<Model>, columns: &[Column; 20]) {
+    d2.draw_plane(
+        Vector3::new(0.0, 0.0, 0.0),
+        Vector2::new(32.0, 32.0),
+        Color::LIGHTGRAY
+    );
+    d2.draw_cube(
+        Vector3::new(-16.0, 2.5, 0.0),
+        1.0, 5.0, 32.0, Color::BLUE
+    );
+    d2.draw_cube(
+        Vector3::new(16.0, 2.5, 0.0),
+        1.0, 5.0, 32.0, Color::LIME
+    );
+    d2.draw_cube(
+        Vector3::new(0.0, 2.5, 16.0),
+        32.0, 5.0, 1.0, Color::GOLD
+    );
+
+    for (index, model) in models.into_iter().enumerate() {
+        let position = columns[index].position;
+        let color = columns[index].color;
+        d2.draw_model(&model, position, 1.0, color);
+    }
+}
+
 fn main() {
     let (mut rl, thread) = raylib::init()
         .size(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -70,8 +96,6 @@ fn main() {
             rl.load_model_from_mesh(&thread, mesh).unwrap()
         )
     }
-    let mesh: Mesh = columns[0].generate_mesh(&thread);
-    let model: Model = rl.load_model_from_mesh(&thread, &mesh).unwrap();
     // Borrow models vec to use in the loop
     let models = &column_models;
 
@@ -86,40 +110,7 @@ fn main() {
         d.clear_background(Color::DARKGREEN);
         {
             let mut d2 = d.begin_mode_3D(camera);
-
-            d2.draw_plane(
-                Vector3::new(0.0, 0.0, 0.0),
-                Vector2::new(32.0, 32.0),
-                Color::LIGHTGRAY
-            );
-            d2.draw_cube(
-                Vector3::new(-16.0, 2.5, 0.0),
-                1.0, 5.0, 32.0, Color::BLUE
-            );
-            d2.draw_cube(
-                Vector3::new(16.0, 2.5, 0.0),
-                1.0, 5.0, 32.0, Color::LIME
-            );
-            d2.draw_cube(
-                Vector3::new(0.0, 2.5, 16.0),
-                32.0, 5.0, 1.0, Color::GOLD
-            );
-
-            // for column in columns.into_iter() {
-            //     d2.draw_cube(column.position, 2.0, column.height, 2.0, column.color);
-            //     d2.draw_cube_wires(column.position, 2.0, column.height, 2.0, Color::MAROON);
-            // };
-
-            // d2.draw_model(
-            //     &model,
-            //     columns[0].position, 1.0, columns[0].color
-            // );
-
-            for (index, model) in models.into_iter().enumerate() {
-                let position = columns[index].position;
-                let color = columns[index].color;
-                d2.draw_model(&model, position, 1.0, color);
-            }
+            render_scene(&mut d2, models, &columns);
         }
         d.draw_rectangle(10, 10, 220, 70, Color::SKYBLUE);
         d.draw_rectangle_lines(10, 10, 220, 70, Color::BLUE);
